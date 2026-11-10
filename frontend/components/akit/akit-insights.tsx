@@ -95,7 +95,7 @@ export function CatchByDsv({ s }: { s: AkitSummary }) {
         ))}
       </div>
       <RateScale base={s.base_catch} />
-      <p className="text-[11px] text-zinc-500">The thin line on each bar shows the range we are 95% confident in. Hover a bar for details.</p>
+      <p className="text-xs text-zinc-400">The thin line on each bar shows the range we are 95% confident in. Hover a bar for details.</p>
     </div>
   )
 }
@@ -172,7 +172,7 @@ export function SiceSplit({ s }: { s: AkitSummary }) {
   return (
     <div className="flex flex-col gap-3">
       <RateBars rows={rows} base={s.base_catch} scale={1} label={(r) => `${pct(r.catch)} caught`} />
-      <p className="text-[11px] leading-relaxed text-zinc-500">
+      <p className="text-xs leading-relaxed text-zinc-400">
         Measured over the first half-second after the throw (the tracking data stops there). Compare with Finding 1: space at the throw matters far
         more than space gained afterwards.
       </p>
@@ -190,7 +190,7 @@ export function QbDecision({ s }: { s: AkitSummary }) {
         <span className="text-sm text-zinc-400">of throws went to the receiver with the most space</span>
       </div>
       <RateBars rows={rows} base={s.base_catch} scale={1.15} label={(r) => `${pct(r.catch)} caught · ${r.yards.toFixed(1)} yd`} />
-      <p className="text-[11px] leading-relaxed text-zinc-500">
+      <p className="text-xs leading-relaxed text-zinc-400">
         When the QB skipped the most open receiver, that receiver typically had {s.qb.gap_median.toFixed(1)} yd² more space than the one who got the
         ball. We don&apos;t account for the QB&apos;s reads or pass rush pressure.
       </p>
@@ -260,7 +260,7 @@ export function AucChart({ s }: { s: AkitSummary }) {
         })}
         {node}
       </div>
-      <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
+      <p className="mt-1 text-xs leading-relaxed text-zinc-400">
         Separation is just the distance to the closest defender. Open space also looks at where every defender is running and facing. Both predict
         catches well and mostly agree; the change in space after the throw is no better than a coin flip.
       </p>
@@ -396,7 +396,7 @@ export function AkitLeaderboard({
           {all ? "Show top 10" : `Show all ${rows.length}`}
         </button>
       )}
-      <p className="mt-3 text-[11px] leading-relaxed text-zinc-500">
+      <p className="mt-3 text-xs leading-relaxed text-zinc-400">
         Receivers with few targets are pulled toward the league average ({league.toFixed(1)} yd²) so a handful of lucky plays can&apos;t top the list.
         Minimum 15 targets.
       </p>

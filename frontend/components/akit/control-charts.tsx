@@ -261,7 +261,7 @@ export function SeparationVsControl({ d }: { d: ControlData }) {
         <Legend items={[["Complete", COMPLETE], ["Incomplete / INT", INCOMPLETE]]} />
         <RateScale base={d.base_rate} />
       </div>
-      <p className="text-[11px] text-zinc-500">Hover the shaded areas to see how often passes there were caught.</p>
+      <p className="text-xs text-zinc-400">Hover the shaded areas to see how often passes there were caught.</p>
     </div>
   )
 }
@@ -369,7 +369,7 @@ export function ControlTimeline({ d }: { d: ControlData }) {
         <SmallTimeline rows={d.timeline.territory} label="Receiver's own space (yd²)" fmt={(v) => v.toFixed(1)} shown={shown} index={2} />
       </div>
       <Legend items={[["Complete", COMPLETE], ["Incomplete / INT", INCOMPLETE]]} />
-      <p className="text-[11px] text-zinc-500">Shaded bands show the range we are 95% confident in. Hover a chart to read both lines at that moment.</p>
+      <p className="text-xs text-zinc-400">Shaded bands show the range we are 95% confident in. Hover a chart to read both lines at that moment.</p>
     </div>
   )
 }
@@ -439,7 +439,7 @@ export function LeverageGrid({ d }: { d: ControlData }) {
         {node}
       </div>
       <RateScale base={d.base_rate} />
-      <p className="text-[11px] text-zinc-500">
+      <p className="text-xs text-zinc-400">
         Rows: how far the closest defender was from the receiver. Dashed boxes have too few plays to trust; — means it never happens.
       </p>
     </div>
@@ -539,7 +539,7 @@ export function Hypotheses({ d }: { d: ControlData }) {
         <CoesBars rows={d.hypotheses.speed} title="Receiver speed when the ball is thrown (mph)" note={(r) => `${r.air_yards} air yd`} shown={shown} />
         <CoesBars rows={d.hypotheses.hips} title="Which way the closest defender's hips face" shown={shown} />
       </div>
-      <p className="text-[11px] leading-relaxed text-zinc-500">
+      <p className="text-xs leading-relaxed text-zinc-400">
         Faster receivers look worse, but they are also running deeper routes (typical throw distance under each bar), so speed itself isn&apos;t the
         cause. The defender&apos;s hip direction made only a tiny difference, so we left it out of the model.
       </p>

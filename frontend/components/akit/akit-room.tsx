@@ -31,8 +31,9 @@ import type { AkitCamera } from "@/components/replay/akit-scene"
 import { opponentOf, ord, ScoreBug, Transport } from "./broadcast-hud"
 import { AkitFilmstrip } from "./akit-filmstrip"
 import { PlayerFace } from "./player-face"
+import { Tex } from "./tex"
 import { ReceiverPicker } from "./receiver-picker"
-import { AkitLowerThird, FieldLegend, FlightChart, NumbersKey } from "./akit-hud"
+import { AkitLowerThird, FieldLegend, FlightChart } from "./akit-hud"
 import { getControlData, type ControlData } from "@/lib/control"
 import { ControlTimeline, Hypotheses, LeverageGrid, SameSeparation, SeparationVsControl } from "./control-charts"
 import { akitHeadline, AkitLeaderboard, AucChart, CatchByDsv, PositionTable, QbDecision, SiceSplit } from "./akit-insights"
@@ -50,6 +51,20 @@ const CAMERAS: { value: AkitCamera; label: string; icon: typeof Tv }[] = [
   { value: "orbit", label: "Free orbit", icon: Orbit },
 ]
 
+/** "Finding 2 · Quarterback decisions" renders as a teal pill plus label; other eyebrows as plain labels. */
+function Eyebrow({ text }: { text: string }) {
+  const [lead, rest] = text.split(" · ")
+  if (/^Finding \d+$/.test(lead) && rest) {
+    return (
+      <p className="flex items-center gap-2 text-sm font-medium text-zinc-200">
+        <span className="rounded-md bg-teal-400/15 px-2 py-0.5 text-xs font-semibold text-teal-200 ring-1 ring-teal-400/30">{lead}</span>
+        {rest}
+      </p>
+    )
+  }
+  return <p className="text-sm font-medium text-zinc-300">{text}</p>
+}
+
 function Panel({
   eyebrow,
   title,
@@ -66,9 +81,9 @@ function Panel({
 }) {
   return (
     <section className={`rounded-lg border border-white/[0.08] bg-[#0e1014] p-6 ${className}`}>
-      <p className="text-xs font-medium text-zinc-500">{eyebrow}</p>
-      <h2 className="mt-1 text-lg font-medium text-zinc-50">{title}</h2>
-      {hint ? <p className="mt-1 mb-6 max-w-2xl text-sm leading-relaxed text-zinc-400">{hint}</p> : <div className="mb-6" />}
+      <Eyebrow text={eyebrow} />
+      <h2 className="mt-2 text-xl font-medium text-zinc-50">{title}</h2>
+      {hint ? <p className="mt-1.5 mb-6 max-w-2xl text-sm leading-relaxed text-zinc-300">{hint}</p> : <div className="mb-6" />}
       {children}
     </section>
   )
@@ -350,9 +365,6 @@ export function AkitRoom() {
             <div className="mt-3">
               <AkitFilmstrip plays={plays} current={current} onSelect={setCurrent} progress={n > 1 ? frame / (n - 1) : 0} />
             </div>
-            <div className="mt-3">
-              <NumbersKey />
-            </div>
           </section>
 
           <div id="finding" className="grid scroll-mt-20 gap-6 xl:grid-cols-2">
@@ -467,25 +479,50 @@ export function AkitRoom() {
           </section>
 
           <Panel eyebrow="Method" title="How it is measured" className="scroll-mt-20">
-            <div id="method" className="grid gap-6 text-sm leading-relaxed text-zinc-400 md:grid-cols-3">
-              <div>
-                <h3 className="mb-1 font-medium text-zinc-200">Influence tensor</h3>
-                Each player is an anisotropic Gaussian: centered 0.5 s ahead along the velocity vector, long axis along body orientation, σ²_long = σ₀² +
-                0.1·s², σ²_lat = σ₀² / (1 + 0.05·s²), σ₀ = 1.5 yd. A 0.5 yd cell belongs to the receiver when his influence beats all 11 defenders and exceeds
-                τ = 0.1.
+            <div id="method" className="flex flex-col gap-8 text-sm leading-relaxed text-zinc-300">
+              <div className="grid gap-8 lg:grid-cols-2">
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-base font-medium text-zinc-50">1. Every player is an influence field</h3>
+                  <p>
+                    Each player <Tex>{String.raw`i`}</Tex> is an anisotropic Gaussian, centered half a second ahead along his velocity and stretched along the
+                    way his body faces:
+                  </p>
+                  <div className="rounded-md border border-white/[0.06] bg-white/[0.02] px-4 py-2">
+                    <Tex block>{String.raw`I_i(\mathbf{x}) = \exp\!\Big(-\tfrac{1}{2}\,(\mathbf{x}-\boldsymbol{\mu}_i)^{\top}\,\Sigma_i^{-1}\,(\mathbf{x}-\boldsymbol{\mu}_i)\Big)`}</Tex>
+                    <Tex block>{String.raw`\boldsymbol{\mu}_i = \mathbf{p}_i + 0.5\,\mathbf{v}_i \qquad \Sigma_i = R(\theta_i)\begin{pmatrix}\sigma_{\text{long}}^2 & 0\\ 0 & \sigma_{\text{lat}}^2\end{pmatrix}R(\theta_i)^{\top}`}</Tex>
+                    <Tex block>{String.raw`\sigma_{\text{long}}^2 = \sigma_0^2 + 0.1\,s_i^2 \qquad \sigma_{\text{lat}}^2 = \frac{\sigma_0^2}{1 + 0.05\,s_i^2} \qquad \sigma_0 = 1.5\ \text{yd}`}</Tex>
+                  </div>
+                  <p className="text-zinc-400">
+                    <Tex>{String.raw`\mathbf{p}_i`}</Tex> position, <Tex>{String.raw`\mathbf{v}_i`}</Tex> velocity, <Tex>{String.raw`s_i`}</Tex> speed (yd/s),{" "}
+                    <Tex>{String.raw`\theta_i`}</Tex> body orientation. Faster players reach further ahead and narrower to the side.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-base font-medium text-zinc-50">2. Open space (DSV) and space change (SICE)</h3>
+                  <p>
+                    A 0.5 × 0.5 yd cell belongs to receiver <Tex>{String.raw`r`}</Tex> when his influence beats every defender{" "}
+                    <Tex>{String.raw`j \in D`}</Tex> and clears a floor <Tex>{String.raw`\tau = 0.1`}</Tex>. Open space adds up those cells in a 30 × 30 yd window:
+                  </p>
+                  <div className="rounded-md border border-white/[0.06] bg-white/[0.02] px-4 py-2">
+                    <Tex block>{String.raw`\begin{aligned}\text{DSV}_r(t) &= \sum_{\mathbf{x}\,\in\,\text{window}} 0.25\ \text{yd}^2 \cdot \mathbf{1}\big[\,\mathbf{x}\ \text{owned by}\ r\,\big] \\ \mathbf{x}\ \text{owned by}\ r &\iff I_r(\mathbf{x},t) > \max_{j \in D} I_j(\mathbf{x},t)\ \ \text{and}\ \ I_r(\mathbf{x},t) > \tau\end{aligned}`}</Tex>
+                    <Tex block>{String.raw`\text{SICE}_r = \frac{\text{DSV}_r(t_{\text{throw}} + 0.5\,\text{s}) + 1}{\text{DSV}_r(t_{\text{throw}}) + 1}`}</Tex>
+                  </div>
+                  <p className="text-zinc-400">
+                    <Tex>{String.raw`\text{SICE} > 1`}</Tex> means the receiver gained space after the throw (shown as +%). The +1 yd² keeps the ratio stable when
+                    space at the throw is near zero.{" "}
+                    {summary ? `${summary.n_plays.toLocaleString()} targets and ${summary.n_options.toLocaleString()} receiver options across ${summary.n_games} games; ` : ""}
+                    intervals are 95% bootstrap.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="mb-1 font-medium text-zinc-200">DSV &amp; SICE</h3>
-                DSV = receiver-owned area (yd²) in a 30×30 yd window centered on where he is 0.5 s after the throw, scored for every route runner. SICE =
-                (DSV at +0.5 s + 1) / (DSV at the throw + 1).{" "}
-                {summary ? `${summary.n_plays.toLocaleString()} targets and ${summary.n_options.toLocaleString()} receiver options across ${summary.n_games} games.` : ""}{" "}
-                CIs are 95% bootstrap.
-              </div>
-              <div>
-                <h3 className="mb-1 font-medium text-zinc-200">Limits</h3>
-                NFL Big Data Bowl regional data: all 22 players and the ball, 2021 weeks 1–8. Tracking ends 0.5 s after the release, so the catch point is
-                not observed. The target is parsed from the play-by-play text. The replay shows three players (QB, target, closest defender) and the ball; the
-                teal space map is still computed against every defender within 12 yd. Ball height is illustrative.
+              <div className="flex flex-col gap-2 border-t border-white/[0.06] pt-6">
+                <h3 className="text-base font-medium text-zinc-50">Limits</h3>
+                <ul className="grid list-disc gap-x-8 gap-y-1 pl-5 text-zinc-400 md:grid-cols-2">
+                  <li>NFL Big Data Bowl regional data: all 22 players and the ball, 2021 weeks 1–8.</li>
+                  <li>Tracking ends 0.5 s after the throw, so the catch point is not observed.</li>
+                  <li>The targeted receiver is parsed from the play-by-play text.</li>
+                  <li>The replay shows the QB, target and closest defender; the space map uses every defender within 12 yd. Ball height is illustrative.</li>
+                </ul>
               </div>
             </div>
           </Panel>

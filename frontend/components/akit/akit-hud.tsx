@@ -89,19 +89,6 @@ export function AkitLowerThird({ m, dsv, nearest, phase }: { m: AkitMeta; dsv: n
   )
 }
 
-/** Key under the plays strip: what each number on screen means. */
-export function NumbersKey() {
-  return (
-    <div className="grid gap-x-6 gap-y-2 rounded-md border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-xs leading-relaxed text-zinc-400 md:grid-cols-2 xl:grid-cols-4">
-      {Object.values(DEFINITIONS).map((d) => (
-        <p key={d.title}>
-          <span className="font-medium text-zinc-200">{d.title}:</span> {d.body}
-        </p>
-      ))}
-    </div>
-  )
-}
-
 /** DSV through the pass flight, with a playhead. */
 export function FlightChart({ m, frame, className = "" }: { m: AkitMeta; frame: number; className?: string }) {
   const W = 260
