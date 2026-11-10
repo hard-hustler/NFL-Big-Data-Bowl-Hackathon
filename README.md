@@ -209,9 +209,6 @@ git clone --depth 1 https://github.com/ThompsonJamesBliss/nfl-big-data-bowl-regi
 .venv/bin/python scripts/build_akit.py ~/Downloads/NFL/bdb-regional/data   # -> backend/data/*.parquet
 .venv/bin/python scripts/export_static.py                                    # -> frontend/public/data/*.json
 .venv/bin/python scripts/export_headshots.py                                 # -> headshots.json
-# deep-dive charts -> control.json
-git clone --depth 1 https://github.com/hard-hustler/NFL-PRE-WORK ~/Downloads/NFL/NFL-PRE-WORK
-.venv/bin/python scripts/export_prework_charts.py ~/Downloads/NFL/NFL-PRE-WORK/data/derived
 ```
 
 | Path | What it does |
