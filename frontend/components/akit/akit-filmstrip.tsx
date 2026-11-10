@@ -23,11 +23,29 @@ function Spark({ s }: { s: number[] }) {
   )
 }
 
-export function AkitFilmstrip({ plays, current, onSelect }: { plays: AkitPlayRow[]; current: AkitPlayRow | null; onSelect: (p: AkitPlayRow) => void }) {
+export function AkitFilmstrip({
+  plays,
+  current,
+  onSelect,
+  progress = 0,
+}: {
+  plays: AkitPlayRow[]
+  current: AkitPlayRow | null
+  onSelect: (p: AkitPlayRow) => void
+  /** 0–1 playback progress of the active play, drawn along the bottom of its card. */
+  progress?: number
+}) {
   const ref = useRef<HTMLDivElement>(null)
   const activeKey = current ? `${current.game_id}-${current.play_id}` : ""
   useEffect(() => {
-    ref.current?.querySelector<HTMLElement>(`[data-key="${activeKey}"]`)?.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" })
+    // Scroll only the strip sideways (scrollIntoView would also yank the page while autoplay advances).
+    const strip = ref.current
+    const card = strip?.querySelector<HTMLElement>(`[data-key="${activeKey}"]`)
+    if (!strip || !card) return
+    const left = card.offsetLeft - strip.offsetLeft
+    if (left < strip.scrollLeft || left + card.offsetWidth > strip.scrollLeft + strip.clientWidth) {
+      strip.scrollTo({ left: Math.max(0, left - 12), behavior: "smooth" })
+    }
   }, [activeKey])
 
   return (
@@ -44,9 +62,15 @@ export function AkitFilmstrip({ plays, current, onSelect }: { plays: AkitPlayRow
             onClick={() => onSelect(p)}
             className={cn(
               "flex w-[208px] shrink-0 snap-start flex-col overflow-hidden rounded-md border bg-[#0e1014] text-left transition-all hover:border-white/20",
+              "relative",
               active ? "border-teal-400/70" : "border-white/[0.08]"
             )}
           >
+            {active && (
+              <span className="absolute inset-x-0 bottom-0 z-10 h-0.5 bg-white/10">
+                <span className="block h-full bg-teal-400 transition-[width] duration-100 ease-linear" style={{ width: `${Math.round(progress * 100)}%` }} />
+              </span>
+            )}
             <div className="relative bg-white/[0.02] px-1 pt-6">
               <Spark s={p.dsv_series} />
               <span
