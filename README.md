@@ -2,6 +2,8 @@
 
 **Live demo:** https://nfl-big-data-bowl-hackathon.vercel.app
 
+![AirSpace: 3D replay of a Cooper Kupp target with the live open-space readout](assets/banner.png)
+
 ## The question
 
 > **When the quarterback lets go of the ball, does the receiver's space help or hurt?**
