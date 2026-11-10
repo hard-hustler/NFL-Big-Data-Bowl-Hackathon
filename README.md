@@ -6,23 +6,23 @@
 
 > **When the quarterback lets go of the ball, does the receiver's space help or hurt?**
 
-Tracking data usually describes "open" with one number: the distance to the nearest defender. We ask whether that is enough. Two receivers can be the same two yards from their defender and still be in very different positions, because one of them owns the spot where the ball will come down and the other does not.
+"Open" is usually one number: the distance to the nearest defender. But two receivers can both be two yards from their defender and still be in very different spots. One owns the place where the ball will come down. The other does not.
 
 ## Abstract
 
-We studied every pass thrown to a wide receiver, tight end or running back in 122 NFL games from the 2021 season (weeks 1 to 8): **7,104 targets**. We turn each of the 22 players into a moving, direction-aware field of influence. A receiver's **open space** is the area, in square yards, that he owns at the moment of the throw, measured against all 11 defenders.
+We looked at every pass to a wide receiver, tight end or running back in 122 NFL games (2021, weeks 1 to 8): **7,104 targets**. Each player becomes a moving, direction-aware zone of influence. A receiver's **open space** is the area he owns, in square yards, when the ball is thrown.
 
-What we found:
+**What we found**
 
-- **Open space at the throw predicts the catch.** Receivers in the most-open quarter are caught 82% of the time, against 48% in the least-open quarter.
-- **Quarterbacks often skip the open man.** Only 30% of throws go to the receiver with the most space. Those throws are caught 76% of the time.
-- **Space that opens after the throw does not help.** Where the receiver stands when the ball leaves the quarterback's hand is what counts.
-- **Distance alone hides the story.** At the same separation, the receiver who controls the landing spot is caught up to twice as often (34% against 67% at 1 to 2 yards).
-- **Catches are won before the throw.** Control of the landing spot pulls apart in the last second before release, while separation barely moves.
+| | Finding | Key number |
+|---|---|---|
+| 1 | More open space at the throw means more catches | **82%** caught with the most space, **48%** with the least |
+| 2 | Quarterbacks often skip the most open receiver | only **30%** of throws go to him; those are caught **76%** of the time |
+| 3 | Space gained after the throw does not help | **65%** vs **61%** caught |
+| 4 | Distance alone hides who owns the landing spot | at 1 to 2 yards apart: **34%** vs **67%** caught |
+| 5 | Catches are won in the second before the throw | control at the throw: **0.75** caught vs **0.62** not caught |
 
-One honest limit: tracking stops half a second after the throw, so we measure the moment of release, not the catch itself. And plain separation is a slightly better single predictor of a catch than our open-space number (0.70 against 0.66). We explain why we keep both in [chapter 4](#4-is-open-space-a-good-measure).
-
-*Every chart below comes from the [live dashboard](https://nfl-big-data-bowl-hackathon.vercel.app). Teal means good for the offense, orange means good for the defense, and grey is the league average.*
+*In every chart below, teal is good for the offense, orange is good for the defense, and grey is the league average.*
 
 ---
 
@@ -30,147 +30,161 @@ One honest limit: tracking stops half a second after the throw, so we measure th
 
 ### 1. More open space at the throw means more catches
 
-![Finding 1: space at the throw](assets/screenshot-2026-11-10-13-12-20.png)
+![Finding 1](assets/screenshot-2026-11-10-13-12-20.png)
 
-**How to read it.** We sorted every throw into four equal groups, from least to most open space around the receiver. Each bar is the share of passes caught in that group. The dashed line is the average (64%). The thin line on each bar is the range we are 95% confident in.
+Every throw is sorted into four equal groups, from least to most open space.
 
-**What it says.**
-- The catch rate climbs with every step: 48%, 57%, 68%, 82%.
-- The most open quarter (30 to 33 yd² of space) is caught **34 points** more often than the least open quarter (9 to 23 yd²).
-- Open receivers also gain more yards: 5.3 yards per target in the least-open group, 9.4 in the most-open group.
+- The catch rate climbs at every step: **48% → 57% → 68% → 82%**.
+- Open receivers also gain more: 9.4 yards per target in the most-open group against 5.3 in the least-open group.
 
 ### 2. Quarterbacks often skip the most open receiver
 
-![Finding 2: quarterback decisions](assets/screenshot-2026-11-10-13-12-33.png)
+![Finding 2](assets/screenshot-2026-11-10-13-12-33.png)
 
-**How to read it.** On every play we ranked all the route runners by open space at the throw. Each bar shows how often the pass was caught depending on which of those receivers the quarterback picked.
+On each play, every route runner is ranked by open space. The bars show how often the pass was caught, depending on who the quarterback picked.
 
-**What it says.**
-- Only **30%** of throws went to the most open receiver. Picking at random among the options would hit him 22% of the time.
-- Throws to the most open receiver were caught **76%** of the time and gained 9.0 yards. Throws to the third most open receiver were caught 57% of the time, and throws to the fourth or lower 53%.
-- When the quarterback passed on the open man, that receiver typically had **4.5 yd²** more space than the one who got the ball.
+- Only **30%** of throws went to the most open receiver.
+- Those throws were caught **76%** of the time. Throws to the 4th option or lower were caught **53%** of the time.
+- When the quarterback passed on the open man, that receiver had about **4.5 yd²** more space than the one who got the ball.
 
-**Caution.** We do not model the quarterback's reads or the pass rush. A checkdown to a running back can be the right call, and running backs are the most open option about half of the time.
+We don't see the quarterback's reads or the pass rush, so some of these choices were right for reasons the data can't show.
 
 ### 3. Space that opens after the throw barely helps
 
-![Finding 3: after the throw](assets/screenshot-2026-11-10-13-13-15.png)
+![Finding 3](assets/screenshot-2026-11-10-13-13-15.png)
 
-**How to read it.** We compared the space a receiver owned at the throw with the space he owned half a second later, the last moment the tracking data covers. We split throws into those where he lost space and those where he gained it.
+We compared each receiver's space at the throw with his space half a second later, the last moment the tracking covers.
 
-**What it says.**
-- Receivers who lost space were caught 65% of the time (4,308 throws). Receivers who gained space were caught 61% of the time (2,518 throws).
-- Gaining space after the ball is out does not raise the catch rate. Compare this with chapter 1: space **at the throw** matters far more.
-- A receiver who starts with a lot of space has little room to gain more, because the scale tops out near 33 yd².
+- Receivers who **lost** space: **65%** caught (4,308 throws).
+- Receivers who **gained** space: **61%** caught (2,518 throws).
 
-### 4. Is open space a good measure?
+What matters is the space a receiver has when the ball leaves the quarterback's hand.
 
-![Finding 4: does open space predict a catch?](assets/screenshot-2026-11-10-13-12-54.png)
+### 4. How good is open space as a measure?
 
-**How to read it.** Each dot scores how well a measure tells catches from incompletions. 0.5 is a coin flip and 1.0 is always right. Further right is better.
+![Finding 4](assets/screenshot-2026-11-10-13-12-54.png)
 
-**What it says.**
-- Plain **separation** (distance to the closest defender) scores 0.70. Our **open space at the throw** scores 0.66. Open space half a second later scores 0.63.
-- The **change in space** after the throw scores 0.48, no better than a coin flip. This confirms chapter 3.
-- The two main measures mostly agree (rank correlation 0.73). Open space looks at where every defender is running and facing, not just the closest one.
+Each dot scores how well a measure tells catches from incompletions: 0.5 is a coin flip, 1.0 is perfect.
 
-**Why we keep open space anyway.** Separation is a little better as a single predictor, and we say so. Open space is the measure that lets us rank **every** receiver on the play at the throw, which is what makes chapter 2 possible. It also shows where the space is, which is what the 3D replay draws.
+| Measure | Score |
+|---|---|
+| Separation at the throw (distance to closest defender) | **0.70** |
+| Open space at the throw | **0.66** |
+| Open space 0.5 s later | 0.63 |
+| Change in space after the throw | 0.48 (coin flip) |
+
+Separation is slightly better on its own, and the two mostly agree. We keep open space because it is the only one of the two that can rank **every** receiver on a play at once. That ranking is what makes finding 2 possible.
 
 ### 5. Who gets the space
 
-![Leaderboard of receivers by open space](assets/screenshot-2026-11-10-13-14-15.png)
+![Leaderboard](assets/screenshot-2026-11-10-13-14-15.png)
 
-**How to read it.** Average open space at the throw for each receiver with at least 15 targets (175 receivers). To keep small samples from topping the list, each average is pulled slightly toward the league average. Click a name on the site to watch his plays.
+Average open space at the throw for receivers with at least 15 targets (175 players), adjusted so small samples don't top the list.
 
-**What it says.**
-- Running backs fill the top of the list: 17 of the top 20. Compare receivers within a position.
-- The median receiver has 27 targets, so treat the list as "worth a look", not a final ranking.
+- Running backs fill **17 of the top 20** spots. They are often the safety valve, so compare players within a position.
+- The typical player has 27 targets, so read this as "worth a look", not a final ranking.
 
-![Open space and catch rate by position](assets/screenshot-2026-11-10-13-14-34.png)
+![Position groups](assets/screenshot-2026-11-10-13-14-34.png)
 
-**How to read it.** The same measure for the three position groups, with the catch rate for each.
+| Position | Targets | Open space at throw | Caught |
+|---|---|---|---|
+| RB | 1,270 | 28.2 yd² | **76%** |
+| TE | 1,544 | 25.7 yd² | 67% |
+| WR | 4,290 | 25.5 yd² | 59% |
 
-**What it says.**
-- Running backs get the most space (28.2 yd² at the throw) and are caught most often (76%).
-- Tight ends (25.7 yd², 67%) and wide receivers (25.5 yd², 59%) get almost the same space but differ by 8 points in catch rate. Space is only part of the story.
-- Between 32% and 37% of receivers gain space in the half second after the throw, in every group.
+Tight ends and wide receivers get almost the same space but differ by 8 points in catch rate. Space explains a lot, but not everything.
 
 ---
 
 ## Deep dive: separation is a distance, control is a field
 
-Chapters 1 to 5 ask how much space a receiver owns. The deep dive asks a sharper question: **when the ball is thrown, who owns the spot where it will come down?**
+Open space asks how much room a receiver has. The deep dive asks a sharper question: **when the ball is thrown, who owns the spot where it will come down?**
 
-We score this as **control of the landing spot**: 0.5 is a toss-up and 1.0 means the receiver owns it. Because tracking ends half a second after the throw, we estimate where the ball will land by projecting the ball's path and the receiver's path forward until they meet. We use the 6,790 targets where that projection is usable. As a check, 93% of throws the play-by-play labels "deep" land at 15 or more estimated air yards, and 95% of those labelled "short" land under 15.
+We call this **control of the landing spot**: 0.5 is a toss-up, 1.0 means the receiver owns it. Tracking ends half a second after the throw, so we estimate the landing spot from the ball's direction and the receiver's path. This works for 6,790 targets.
 
-### 6. Two receivers can be equally open and still have very different odds
+### 6. Same separation, very different odds
 
 ![Same separation, different outcome](assets/screenshot-2026-11-10-13-15-18.png)
 
-**How to read it.** Each column is a range of separation. Inside each column we split the plays into three equal groups by how much the receiver controlled the landing spot: most, middle and least. Each cell is the catch rate for that group, and the line chart on the right shows the same numbers.
+Each column is a range of separation. Inside each column, plays are split into three equal groups by control.
 
-**What it says.**
-- At **1 to 2 yards** of separation, the catch rate is **34%** for the least-control group and **67%** for the most-control group: twice the catches at the same distance.
-- The gap is wide where the defender is close enough to matter but not on top of the receiver: 2 to 3 yards is 42% against 78%, and 3 to 4 yards is 58% against 86%.
-- At 0 to 1 yards almost everything fails (17% to 27%), and at 10 or more yards almost everything succeeds (86% to 93%). Control cannot rescue a receiver who is smothered, and it does not matter once he is wide open.
+| Separation | Least control | Most control |
+|---|---|---|
+| 1 to 2 yd | **34%** | **67%** |
+| 2 to 3 yd | 42% | 78% |
+| 3 to 4 yd | 58% | 86% |
 
-### 7. Control is related to distance, but it is not the same thing
+At the same distance, the receiver who controls the landing spot is caught **about twice as often**. Control matters most at 1 to 4 yards. Below 1 yard almost every pass fails, and beyond 10 yards almost every pass is caught.
 
-![Control is not just distance](assets/screenshot-2026-11-10-13-15-32.png)
+### 7. Control is not just distance
 
-**How to read it.** Each dot is one throw. Teal was caught and orange was not. The horizontal axis is separation, the vertical axis is control of the landing spot, and the dashed line is the toss-up level (0.5). The shaded background is the catch rate in that area.
+![Control vs separation](assets/screenshot-2026-11-10-13-15-32.png)
 
-**What it says.**
-- More separation usually means more control (correlation 0.56), but there is a lot of spread. At the same separation, receivers sit anywhere from toss-up to full control.
-- Moving up at a fixed separation turns the background from orange to teal. That vertical change is the part distance cannot see.
-- The orange cluster in the lower left is receivers who were tight to their defender and had only a toss-up at the landing spot. They were mostly not caught.
+Each dot is one throw (teal = caught, orange = not caught). Above the dashed line, the receiver owns the landing spot.
+
+- More separation usually means more control, but the spread is wide (correlation 0.56).
+- Moving **up** at a fixed separation turns the background from orange to teal. That vertical change is what distance alone cannot see.
 
 ### 8. Catches are won in the second before the throw
 
 ![Timing](assets/screenshot-2026-11-10-13-16-00.png)
 
-**How to read it.** Average values for passes that were caught (teal) and not caught (orange), from one second before the throw to 0.4 seconds after. The three panels show control of the landing spot, separation, and the receiver's own space. Shaded bands are 95% ranges.
+Averages for caught (teal) and not caught (orange) passes, from 1 second before the throw to 0.4 seconds after.
 
-**What it says.**
-- **Control** starts in the same place one second before the throw (about 0.5 for both groups). By the moment of the throw it is **0.75 on caught passes and 0.62 on uncaught passes**.
-- **Separation** is already different a second earlier (about 4.9 yards on caught passes against 3.4 on uncaught ones) and stays roughly flat, drifting down by half a yard on uncaught passes. The gap does not open up in this window.
-- The receiver's **own space** grows from about 8.5 to 23 yd² on caught passes, but only from about 4.5 to 13 yd² on uncaught passes.
-- Together: the catch is decided by how the receiver and his defender are positioned relative to the landing spot as the quarterback releases, not by a distance that changes at the last moment.
+| | 1 s before the throw | At the throw |
+|---|---|---|
+| Control, caught | 0.50 | **0.75** |
+| Control, not caught | 0.49 | **0.62** |
+| Separation, caught | 4.9 yd | 4.8 yd |
+| Separation, not caught | 3.4 yd | 2.9 yd |
 
-### 9. Ideas we tested and what we did with them
+Control starts even and pulls apart in the final second. Separation barely moves. The receiver wins the landing spot before the ball is out.
+
+### 9. Ideas we tested
 
 ![Ideas we tested](assets/screenshot-2026-11-10-13-16-45.png)
 
-**How to read it.** Bars above zero mean the receiver had more control than his separation alone would suggest. Bars below zero mean less.
+Bars above zero mean more control than separation alone would suggest.
 
-**What it says.**
-- **Speed:** the fastest receivers (14+ mph) look worse than their separation suggests. But they are also running much deeper routes (a typical 15.7 air yards, against 5.4 for receivers under 6 mph), so speed itself is not the cause.
-- **Defender hips:** which way the closest defender's hips face made only a tiny difference, so we left it out of the control measure.
+- **Receiver speed:** the fastest receivers (14+ mph) look worse. But they also run much deeper routes (15.7 air yards against 5.4), so the route depth, not the speed, explains it.
+- **Defender hips:** which way the closest defender faces made only a tiny difference, so we left it out.
+
+---
+
+## Conclusion
+
+**Back to the question: the receiver's space helps, but only the space he has at the moment of the throw.**
+
+1. **Space at the throw is what counts.** The most open receivers are caught 82% of the time against 48% for the least open. Space gained after the ball is out adds nothing (61% vs 65%).
+2. **Distance is not the same as being open.** At the same 1 to 2 yards of separation, the receiver who owns the landing spot is caught twice as often (67% vs 34%). Two receivers who look equally open on a stat sheet are often not.
+3. **The catch is decided before the throw.** Control of the landing spot separates catches from incompletions in the last second before release, while the distance to the defender barely changes.
+4. **There is room to improve decisions.** Quarterbacks find the most open receiver on only 30% of throws, and those throws are caught 76% of the time against 53% for the 4th option or lower.
+
+**What it means on the field**
+
+- **Receivers:** win the landing spot before the ball is thrown. Getting there first matters more than adding a yard of distance late.
+- **Quarterbacks and coaches:** "who owns the spot" is a better read than "who has the most distance". Plays that send the ball to the most open man are caught far more often.
+- **Defenders:** being close is not enough. A defender who is beaten to the landing spot loses the play even at two yards.
+- **Analysts:** separation is a strong single number (0.70), and our space measure is close (0.66). The value of a field-based view is that it explains *why* two equal separations end differently, and it ranks every option on the play.
+
+**Limits.** Tracking stops half a second after the throw, so we measure the moment of release, not the catch. These are patterns, not proof of cause: route design, timing and coverage all play a part. We don't model the quarterback's reads or the pass rush. The data covers eight weeks of one season.
 
 ---
 
 ## How we measure it
 
-- **Data.** NFL Next Gen Stats tracking (all 22 players and the ball, 10 times a second) from the Big Data Bowl regional event data, 2021 weeks 1 to 8, plus Pro Football Focus roles to tell route runners from blockers. We keep dropbacks that ended in a catch, incompletion or interception (sacks and scrambles are out). An interception counts as not caught.
-- **The target.** The data does not say who the pass was for, so we read it from the play description ("pass short right to C.Lamb") and match it to a route runner. Ambiguous matches are dropped.
-- **Influence field.** Each player is a smooth ellipse of influence. It is centered half a second ahead along his velocity, stretched along the way his body is facing, and it gets longer and thinner as he speeds up.
-- **Open space.** The area, in yd², that the receiver owns in a 30 by 30 yard window around where he will be half a second after the throw. A spot is his if his influence beats all 11 defenders. We score every route runner on the play, not only the target.
-- **Separation.** The distance to the nearest of the 11 defenders at the throw.
-- **Intervals and validation.** Catch rates carry 95% intervals. Each predictive score (AUC) compares one measure against the outcome on all 7,104 targets. No model is fit, so there is no train and test split to worry about.
+- **Data.** NFL Next Gen Stats tracking (all 22 players and the ball, 10 frames per second), 2021 weeks 1 to 8, with Pro Football Focus roles. Completions, incompletions and interceptions only. Interceptions count as not caught.
+- **The target.** Read from the play description ("pass short right to C.Lamb") and matched to a route runner.
+- **Influence zone.** Each player is an ellipse placed half a second ahead of where he is running, stretched in the direction his body faces, longer and thinner as he speeds up.
+- **Open space.** The area the receiver owns (his influence beats all 11 defenders) in a 30 × 30 yard window around where he will be half a second after the throw.
+- **Separation.** Distance to the nearest defender at the throw.
+- **Confidence.** Catch rates show 95% ranges. Prediction scores (AUC) compare one measure against the result on all 7,104 targets.
 
 ## The site
 
-- **Film room.** Search any of 416 receivers (with a position filter) and step through his targets on a filmstrip. Autoplay moves to the next play one second after one ends.
-- **3D replay.** A stadium built in code shows the quarterback, the target, the closest defender and the ball, with a live map of the cells the receiver owns after the throw. Five cameras: Broadcast, Overhead, All-22, Follow and Free orbit. Ball height is illustrative because tracking is two-dimensional.
-- **Charts.** Every chart on this page is live, animated, and shows details on hover. Each carries a one-line hint on how to read it.
-
-## What to keep in mind
-
-1. Tracking ends half a second after the throw. We study the moment of release, not the catch.
-2. These are associations, not proof of cause. Route design, quarterback timing and coverage all feed the numbers.
-3. We do not model the quarterback's reads or the pass rush.
-4. Open space tops out near 33 yd², so it separates crowded receivers from open ones better than open from very open.
-5. Eight weeks of one season: the intervals describe noise within these 122 games.
+- **Film room.** Search any of 416 receivers and step through his targets. Autoplay moves to the next play.
+- **3D replay.** A stadium built in code shows the quarterback, the target, the closest defender and the ball, with a live map of the receiver's space after the throw. Five camera views.
+- **Charts.** Every chart is interactive, with a plain-language hint on how to read it.
 
 ## Run it
 
@@ -182,35 +196,31 @@ npm install
 npm run dev          # http://localhost:3000
 ```
 
-To deploy on Vercel, import the repo, set **Root Directory** to `frontend`, and keep the Next.js preset. No environment variables are needed. All the data the site reads is already in `frontend/public/data`.
+To deploy on Vercel, import the repo, set **Root Directory** to `frontend`, and keep the Next.js preset. All the data the site needs is already in `frontend/public/data`.
 
-To rebuild the play data from the raw tracking files (about 12 minutes):
+To rebuild the data from the raw tracking files (about 12 minutes):
 
 ```bash
 cd backend
 uv venv .venv --python 3.12 && uv pip install --python .venv/bin/python -r requirements.txt
 git clone --depth 1 https://github.com/ThompsonJamesBliss/nfl-big-data-bowl-regional-event-data ~/Downloads/NFL/bdb-regional
-.venv/bin/python scripts/build_akit.py ~/Downloads/NFL/bdb-regional/data   # about 6 min -> backend/data/*.parquet
-.venv/bin/python scripts/export_static.py                                    # about 6 min -> frontend/public/data/*.json
-.venv/bin/python scripts/export_headshots.py                                 # player headshots -> headshots.json
-# catch-point control charts (deep dive) from the pre-work repo -> control.json
+.venv/bin/python scripts/build_akit.py ~/Downloads/NFL/bdb-regional/data   # -> backend/data/*.parquet
+.venv/bin/python scripts/export_static.py                                    # -> frontend/public/data/*.json
+.venv/bin/python scripts/export_headshots.py                                 # -> headshots.json
+# deep-dive charts -> control.json
 git clone --depth 1 https://github.com/hard-hustler/NFL-PRE-WORK ~/Downloads/NFL/NFL-PRE-WORK
 .venv/bin/python scripts/export_prework_charts.py ~/Downloads/NFL/NFL-PRE-WORK/data/derived
 ```
 
-`backend/main.py` also serves the same data as an API (`.venv/bin/uvicorn main:app --port 8000`).
-
-### Where things are
-
 | Path | What it does |
 |---|---|
-| `backend/scripts/build_akit.py` | Finds the target, builds each influence field, computes open space for every route runner |
-| `backend/akit.py` | API and summary statistics behind the charts |
-| `backend/scripts/export_static.py` | Writes the API responses to static JSON for the site |
-| `frontend/lib/akit.ts` | The influence-field math used in the browser (same as the backend) |
-| `frontend/components/akit/` | The page, the charts, the filmstrip and the receiver picker |
-| `frontend/components/replay/` | The 3D stadium, players and space map |
+| `backend/scripts/build_akit.py` | Finds the target, builds each influence zone, computes open space for every route runner |
+| `backend/akit.py` | API and the summary numbers behind the charts |
+| `backend/scripts/export_static.py` | Writes the data to static JSON for the site |
+| `frontend/lib/akit.ts` | The influence math used in the browser |
+| `frontend/components/` | The page, charts, filmstrip and 3D replay |
 | `frontend/public/data/` | Pre-computed data the site reads |
+| `assets/` | Screenshots used in this README |
 
 ## References
 
@@ -219,4 +229,4 @@ git clone --depth 1 https://github.com/hard-hustler/NFL-PRE-WORK ~/Downloads/NFL
 - Fujimura, A. and Sugihara, K. (2005). Geometric analysis and quantitative evaluation of sport teamwork. *Systems and Computers in Japan*, 36(6), 49 to 58.
 - Narizuka, T., Yamazaki, Y. and Takizawa, K. (2020). *Fundamental framework for the space evaluation in football games.* arXiv:2001.11629.
 
-Tracking data: NFL Next Gen Stats via the NFL Big Data Bowl. Scouting data: Pro Football Focus. Headshots: nflverse rosters. Regional event data: ThompsonJamesBliss/nfl-big-data-bowl-regional-event-data.
+Data: NFL Next Gen Stats via the NFL Big Data Bowl, Pro Football Focus scouting data, nflverse rosters (headshots), and the ThompsonJamesBliss/nfl-big-data-bowl-regional-event-data repository.
