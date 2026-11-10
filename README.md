@@ -22,9 +22,7 @@ What we found:
 
 One honest limit: tracking stops half a second after the throw, so we measure the moment of release, not the catch itself. And plain separation is a slightly better single predictor of a catch than our open-space number (0.70 against 0.66). We explain why we keep both in [chapter 4](#4-is-open-space-a-good-measure).
 
-![The AirSpace dashboard](assets/screenshot-2026-11-10-13-12-22.png)
-
-*The AirSpace dashboard. Every chart below comes from this page. Teal means good for the offense, orange means good for the defense, and grey is the league average.*
+*Every chart below comes from the [live dashboard](https://nfl-big-data-bowl-hackathon.vercel.app). Teal means good for the offense, orange means good for the defense, and grey is the league average.*
 
 ---
 
@@ -161,8 +159,6 @@ We score this as **control of the landing spot**: 0.5 is a toss-up and 1.0 means
 - **Intervals and validation.** Catch rates carry 95% intervals. Each predictive score (AUC) compares one measure against the outcome on all 7,104 targets. No model is fit, so there is no train and test split to worry about.
 
 ## The site
-
-![The AirSpace dashboard](assets/screenshot-2026-11-10-13-12-22.png)
 
 - **Film room.** Search any of 416 receivers (with a position filter) and step through his targets on a filmstrip. Autoplay moves to the next play one second after one ends.
 - **3D replay.** A stadium built in code shows the quarterback, the target, the closest defender and the ball, with a live map of the cells the receiver owns after the throw. Five cameras: Broadcast, Overhead, All-22, Follow and Free orbit. Ball height is illustrative because tracking is two-dimensional.
