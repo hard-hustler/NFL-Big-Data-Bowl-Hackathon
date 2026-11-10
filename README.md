@@ -8,7 +8,7 @@
 
 > **When the quarterback lets go of the ball, does the receiver's space help or hurt?**
 
-"Open" is usually one number: the distance to the nearest defender. But two receivers can both be two yards from their defender and still be in very different spots. One owns the place where the ball will come down. The other does not.
+"Open" is usually one number: the distance to the nearest defender. But two receivers can both be two yards from their defender and still be in very different spots. One owns the place where the ball will come down. The other does not!
 
 ## Abstract
 
