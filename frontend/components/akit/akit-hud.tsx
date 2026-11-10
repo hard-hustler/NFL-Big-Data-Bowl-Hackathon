@@ -1,18 +1,66 @@
 "use client"
 
-import { DEFENSE_COLOR, DOMINANCE_COLOR, OFFENSE_COLOR, type AkitMeta } from "@/lib/akit"
+import { CircleHelp } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { DEFENSE_COLOR, DOMINANCE_COLOR, OFFENSE_COLOR, spaceChange, type AkitMeta } from "@/lib/akit"
 import { PlayerFace } from "./player-face"
 
-/** Broadcast lower third for the targeted receiver: live DSV, SICE, nearest tracked defender. */
+/** Plain-language definitions shown in tooltips and in the key under the plays. */
+export const DEFINITIONS = {
+  space: {
+    title: "Open space",
+    body: "Square yards around the receiver that he controls better than any defender, based on where everyone is, how fast they move and which way they face. Appears once the ball is thrown. More space = easier catch.",
+  },
+  change: {
+    title: "Space change",
+    body: "How much the receiver's open space grew or shrank in the half-second after the throw. +11% means he gained 11% more room. In the analysis this is SICE (1.11 = +11%).",
+  },
+  defender: {
+    title: "Nearest defender",
+    body: "Distance from the receiver to the closest defender at this moment of the replay.",
+  },
+  rank: {
+    title: "Space rank",
+    body: "Where the targeted receiver ranked among all his teammates running routes, by open space at the throw. #1 means the QB threw to the most open receiver.",
+  },
+} as const
+
+function Info({ def }: { def: { title: string; body: string } }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button type="button" aria-label={`What is ${def.title}?`} className="text-zinc-500 transition-colors hover:text-zinc-200">
+          <Info12 />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-64 text-xs leading-relaxed">
+        <span className="font-medium">{def.title}.</span> {def.body}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
+const Info12 = () => <CircleHelp className="size-3" />
+
+/** Broadcast lower third for the targeted receiver: live open space, space change, nearest defender. */
 export function AkitLowerThird({ m, dsv, nearest, phase }: { m: AkitMeta; dsv: number | null; nearest: number | null; phase: string }) {
-  const sice = m.sice
-  const stat = (value: string, unit: string, label: string, accent = false, hide = "") => (
-    <div className={`flex min-w-24 flex-col justify-center border-l border-white/10 px-4 py-2.5 ${hide}`}>
-      <span className={`text-[11px] ${accent ? "text-amber-300" : "text-zinc-500"}`}>{label}</span>
+  const change = spaceChange(m.sice)
+  const stat = (
+    def: { title: string; body: string },
+    value: string,
+    unit: string,
+    sub: React.ReactNode,
+    hide = ""
+  ) => (
+    <div className={`flex min-w-28 flex-col justify-center border-l border-white/10 px-4 py-2 ${hide}`}>
+      <span className="flex items-center gap-1 text-[11px] text-zinc-400">
+        {def.title} <Info def={def} />
+      </span>
       <span className="mt-0.5 font-display text-2xl leading-none font-medium text-zinc-50 tabular-nums">
         {value}
         {unit && <span className="ml-1 text-xs font-normal text-zinc-500">{unit}</span>}
       </span>
+      <span className="mt-1 text-[10px] leading-none text-zinc-500">{sub}</span>
     </div>
   )
   return (
@@ -23,13 +71,33 @@ export function AkitLowerThird({ m, dsv, nearest, phase }: { m: AkitMeta; dsv: n
       </div>
       <div className="flex flex-col justify-center px-4 py-2.5">
         <span className="text-base leading-tight font-medium text-zinc-50">{m.display_name}</span>
-        <span className="mt-0.5 text-xs text-zinc-500">
-          {m.nfl_position} · {m.possession_team} · <span className="capitalize">{(m.route_ran ?? "route").toLowerCase()}</span> · #{m.dsv_rank} of {m.n_options} in space
+        <span className="mt-0.5 flex items-center gap-1 text-xs text-zinc-500">
+          {m.nfl_position} · {m.possession_team} · <span className="capitalize">{(m.route_ran ?? "route").toLowerCase()}</span> · #{m.dsv_rank} of{" "}
+          {m.n_options} most open <Info def={DEFINITIONS.rank} />
         </span>
       </div>
-      {stat(dsv == null ? "—" : dsv.toFixed(1), "yd²", phase, true)}
-      {stat(sice.toFixed(2), "", "SICE", false, "hidden sm:flex")}
-      {stat(nearest == null ? "—" : nearest.toFixed(1), "yd", "Nearest defender", false, "hidden md:flex")}
+      {stat(DEFINITIONS.space, dsv == null ? "—" : dsv.toFixed(1), "yd²", <span className="text-amber-300">{phase}</span>)}
+      {stat(
+        DEFINITIONS.change,
+        change.label,
+        "",
+        <span className={change.gained ? "text-teal-300" : "text-orange-300"}>{change.text}</span>,
+        "hidden sm:flex"
+      )}
+      {stat(DEFINITIONS.defender, nearest == null ? "—" : nearest.toFixed(1), "yd", "right now", "hidden md:flex")}
+    </div>
+  )
+}
+
+/** Key under the plays strip: what each number on screen means. */
+export function NumbersKey() {
+  return (
+    <div className="grid gap-x-6 gap-y-2 rounded-md border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-xs leading-relaxed text-zinc-400 md:grid-cols-2 xl:grid-cols-4">
+      {Object.values(DEFINITIONS).map((d) => (
+        <p key={d.title}>
+          <span className="font-medium text-zinc-200">{d.title}:</span> {d.body}
+        </p>
+      ))}
     </div>
   )
 }

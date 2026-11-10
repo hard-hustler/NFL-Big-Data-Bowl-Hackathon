@@ -162,6 +162,16 @@ export const DEFENSE_COLOR = "#d95926"
 export const DOMINANCE_COLOR = "#10a99a"
 export const NEUTRAL_COLOR = "#71717a"
 
+/** Plain-language version of SICE (space after ÷ space at the throw): "+11%" and what it means. */
+export function spaceChange(sice: number) {
+  const pct = Math.round((sice - 1) * 100)
+  return {
+    label: `${pct > 0 ? "+" : pct < 0 ? "−" : ""}${Math.abs(pct)}%`,
+    text: pct > 0 ? "gained space after the throw" : pct < 0 ? "lost space after the throw" : "space held steady",
+    gained: pct > 0,
+  }
+}
+
 const rgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
 
 /** Diverging completion-rate scale: orange (low) → neutral grey at the league rate → teal (high). */

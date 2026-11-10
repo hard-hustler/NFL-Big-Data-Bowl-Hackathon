@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
-import { DOMINANCE_COLOR, type AkitPlayRow } from "@/lib/akit"
+import { DOMINANCE_COLOR, type AkitPlayRow, spaceChange } from "@/lib/akit"
 
 const RESULT: Record<string, string> = { C: "Catch", I: "Incomplete", IN: "INT" }
 
@@ -78,17 +78,18 @@ export function AkitFilmstrip({
                   "absolute top-2 left-2 rounded px-1.5 py-0.5 text-[10px] font-medium",
                   p.sice > 1 ? "bg-teal-300 text-black" : "bg-zinc-700 text-zinc-100"
                 )}
+                title={`Space change after the throw: ${spaceChange(p.sice).text} (SICE ${p.sice.toFixed(2)})`}
               >
-                SICE {p.sice.toFixed(2)}
+                {spaceChange(p.sice).label} space
               </span>
               <span
                 className={cn(
                   "absolute top-2 right-2 rounded px-1.5 py-0.5 text-[10px]",
                   p.threw_to_best ? "bg-teal-300/90 text-black" : "bg-black/50 text-zinc-300"
                 )}
-                title={p.threw_to_best ? "Thrown to the receiver with the most space" : `Most space: ${p.best_name}`}
+                title={p.threw_to_best ? "Thrown to the receiver with the most space" : `Thrown to the #${p.dsv_rank} most open of ${p.n_options}. Most open: ${p.best_name}`}
               >
-                {p.threw_to_best ? "Most open" : `#${p.dsv_rank} of ${p.n_options}`}
+                {p.threw_to_best ? "Most open" : `#${p.dsv_rank} of ${p.n_options} open`}
               </span>
             </div>
             <div className="flex flex-col gap-0.5 px-3 py-2.5">

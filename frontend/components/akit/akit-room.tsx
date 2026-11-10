@@ -13,6 +13,7 @@ import {
   DOMINANCE_COLOR,
   dominance,
   OFFENSE_COLOR,
+  spaceChange,
   fieldOf,
   getAkitLeaders,
   getAkitPlay,
@@ -31,7 +32,7 @@ import { opponentOf, ord, ScoreBug, Transport } from "./broadcast-hud"
 import { AkitFilmstrip } from "./akit-filmstrip"
 import { PlayerFace } from "./player-face"
 import { ReceiverPicker } from "./receiver-picker"
-import { AkitLowerThird, FieldLegend, FlightChart } from "./akit-hud"
+import { AkitLowerThird, FieldLegend, FlightChart, NumbersKey } from "./akit-hud"
 import { getControlData, type ControlData } from "@/lib/control"
 import { ControlTimeline, Hypotheses, LeverageGrid, SameSeparation, SeparationVsControl } from "./control-charts"
 import { akitHeadline, AkitLeaderboard, AucChart, CatchByDsv, PositionTable, QbDecision, SiceSplit } from "./akit-insights"
@@ -287,7 +288,7 @@ export function AkitRoom() {
                   <div className="absolute right-4 bottom-[84px] left-4 flex items-end justify-between gap-4">
                     <AkitLowerThird m={m} dsv={live.dsv} nearest={live.nearest} phase={phase} />
                     <div className="hidden flex-col gap-2 rounded-md border border-white/10 bg-[#0e1014]/90 p-3 backdrop-blur lg:flex">
-                      <span className="text-xs font-medium text-zinc-400">DSV after the throw (yd²)</span>
+                      <span className="text-xs font-medium text-zinc-400">Open space after the throw (yd²)</span>
                       <FlightChart m={m} frame={frame} className="w-[240px]" />
                       <FieldLegend />
                     </div>
@@ -348,6 +349,9 @@ export function AkitRoom() {
             </div>
             <div className="mt-3">
               <AkitFilmstrip plays={plays} current={current} onSelect={setCurrent} progress={n > 1 ? frame / (n - 1) : 0} />
+            </div>
+            <div className="mt-3">
+              <NumbersKey />
             </div>
           </section>
 
@@ -502,9 +506,9 @@ export function AkitRoom() {
                 <div className="flex flex-col gap-6 p-4">
                   <section className="grid grid-cols-3 gap-2">
                     {[
-                      ["DSV @ release", `${m.dsv_release.toFixed(1)} yd²`],
-                      ["DSV @ arrival", `${m.dsv_arrival.toFixed(1)} yd²`],
-                      ["SICE", m.sice.toFixed(2)],
+                      ["Open space at throw", `${m.dsv_release.toFixed(1)} yd²`],
+                      ["Open space 0.5 s later", `${m.dsv_arrival.toFixed(1)} yd²`],
+                      ["Space change", `${spaceChange(m.sice).label}`],
                       ["Separation", m.separation_at_pass_forward != null ? `${m.separation_at_pass_forward.toFixed(1)} yd` : "—"],
                       ["Result", RESULT[m.pass_result ?? ""] ?? "—"],
                       ["Yards", m.yards_gained != null ? `${m.yards_gained}` : "—"],
