@@ -14,16 +14,16 @@ export const EVENTS: Record<string, [string, string, boolean]> = {
   // label, color, show label on the timeline
   ball_snap: ["Snap", "#e4e4e7", true],
   play_action: ["Play action", "#a1a1aa", false],
-  pass_forward: ["Throw", "#2dd4bf", true],
+  pass_forward: ["Throw", "#10a99a", true],
   pass_arrived: ["Arrives", "#a1a1aa", false],
-  pass_outcome_caught: ["Catch", "#2dd4bf", true],
+  pass_outcome_caught: ["Catch", "#10a99a", true],
   pass_outcome_incomplete: ["Incomplete", "#f87171", true],
   pass_outcome_interception: ["INT", "#f87171", true],
-  pass_outcome_touchdown: ["TD", "#2dd4bf", true],
+  pass_outcome_touchdown: ["TD", "#10a99a", true],
   first_contact: ["Contact", "#a1a1aa", false],
   tackle: ["Tackle", "#e4e4e7", true],
   out_of_bounds: ["Out of bounds", "#e4e4e7", true],
-  touchdown: ["Touchdown", "#2dd4bf", true],
+  touchdown: ["Touchdown", "#10a99a", true],
   qb_sack: ["Sack", "#f87171", true],
 }
 

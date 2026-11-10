@@ -153,10 +153,27 @@ export const getAkitPlays = async (nflId: number, contested: boolean) => {
 }
 export const getAkitPlay = (p: Pick<AkitPlayRow, "game_id" | "play_id">) => get<AkitDetail>(`play/${p.game_id}-${p.play_id}.json`)
 
-/** Palette: offense/defense reuse the validated blue/orange pair; receiver-owned space is teal. */
+/**
+ * Dashboard palette (validated on the dark surface): teal = receiver / the winning side,
+ * orange = defense / the losing side, blue = other offense in the 3D scene, zinc grey = comparison.
+ */
 export const OFFENSE_COLOR = "#3987e5"
 export const DEFENSE_COLOR = "#d95926"
-export const DOMINANCE_COLOR = "#2dd4bf"
+export const DOMINANCE_COLOR = "#10a99a"
+export const NEUTRAL_COLOR = "#71717a"
+
+const rgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+
+/** Diverging completion-rate scale: orange (low) → neutral grey at the league rate → teal (high). */
+export function rateColor(v: number, base: number) {
+  const lo = rgb(DEFENSE_COLOR)
+  const mid = [63, 63, 70]
+  const hi = rgb(DOMINANCE_COLOR)
+  const t = v < base ? Math.max(0, (v - 0.2) / (base - 0.2)) : Math.min(1, (v - base) / (0.95 - base))
+  const [a, b] = v < base ? [lo, mid] : [mid, hi]
+  const c = a.map((x, i) => Math.round(x + (b[i] - x) * t))
+  return `rgb(${c.join(",")})`
+}
 
 /** Model parameters; must match backend/scripts/build_akit.py. */
 export const AKIT = { sigma0: 1.5, k1: 0.1, k2: 0.05, dt: 0.5, tau: 0.1, cell: 0.5, half: 15 }

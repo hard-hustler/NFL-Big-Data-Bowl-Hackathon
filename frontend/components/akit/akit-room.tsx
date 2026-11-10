@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import dynamic from "next/dynamic"
 import { Camera, Crosshair, Grid2x2, Layers, Orbit, PanelRight, Tv } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Toggle } from "@/components/ui/toggle"
@@ -27,7 +26,10 @@ import {
 import type { AkitCamera } from "@/components/replay/akit-scene"
 import { opponentOf, ord, ScoreBug, Transport } from "./broadcast-hud"
 import { AkitFilmstrip } from "./akit-filmstrip"
+import { ReceiverPicker } from "./receiver-picker"
 import { AkitLowerThird, FieldLegend, FlightChart } from "./akit-hud"
+import { getControlData, type ControlData } from "@/lib/control"
+import { ControlTimeline, Hypotheses, LeverageGrid, SameSeparation, SeparationVsControl } from "./control-charts"
 import { akitHeadline, AkitLeaderboard, AucChart, CatchByDsv, PositionTable, QbDecision, SiceSplit } from "./akit-insights"
 
 const AkitScene = dynamic(() => import("@/components/replay/akit-scene"), {
@@ -43,11 +45,25 @@ const CAMERAS: { value: AkitCamera; label: string; icon: typeof Tv }[] = [
   { value: "orbit", label: "Free orbit", icon: Orbit },
 ]
 
-function Panel({ eyebrow, title, children, className = "" }: { eyebrow: string; title: string; children: React.ReactNode; className?: string }) {
+function Panel({
+  eyebrow,
+  title,
+  hint,
+  children,
+  className = "",
+}: {
+  eyebrow: string
+  title: string
+  /** One plain-language sentence on how to read the chart. */
+  hint?: string
+  children: React.ReactNode
+  className?: string
+}) {
   return (
     <section className={`rounded-lg border border-white/[0.08] bg-[#0e1014] p-6 ${className}`}>
       <p className="text-xs font-medium text-zinc-500">{eyebrow}</p>
-      <h2 className="mt-1 mb-6 text-lg font-medium text-zinc-50">{title}</h2>
+      <h2 className="mt-1 text-lg font-medium text-zinc-50">{title}</h2>
+      {hint ? <p className="mt-1 mb-6 max-w-2xl text-sm leading-relaxed text-zinc-400">{hint}</p> : <div className="mb-6" />}
       {children}
     </section>
   )
@@ -57,6 +73,7 @@ const RESULT: Record<string, string> = { C: "Complete", I: "Incomplete", IN: "In
 
 export function AkitRoom() {
   const [summary, setSummary] = useState<AkitSummary | null>(null)
+  const [control, setControl] = useState<ControlData | null>(null)
   const [leaders, setLeaders] = useState<{ league_dsv: number; rows: AkitLeader[] } | null>(null)
   const [receivers, setReceivers] = useState<AkitReceiver[]>([])
   const [receiverId, setReceiverId] = useState<number | null>(null)
@@ -85,6 +102,10 @@ export function AkitRoom() {
         setReceiverId(r[0]?.nfl_id ?? null)
       })
       .catch((e) => setError(`Data not found (${e.message}). Run backend/scripts/export_static.py.`))
+  }, [])
+
+  useEffect(() => {
+    getControlData().then(setControl).catch((e) => setError(e.message))
   }, [])
 
   useEffect(() => {
@@ -143,7 +164,6 @@ export function AkitRoom() {
     return "Ball out"
   }, [m, frame])
 
-  const receiver = receivers.find((p) => p.nfl_id === receiverId)
   const selectReceiver = (id: number) => {
     setReceiverId(id)
     stageRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -161,24 +181,11 @@ export function AkitRoom() {
             <nav className="ml-6 hidden items-center gap-6 text-[13px] text-zinc-400 md:flex">
               <a href="#film" className="hover:text-white">Film room</a>
               <a href="#finding" className="hover:text-white">The finding</a>
+              <a href="#control" className="hover:text-white">Catch-point control</a>
               <a href="#method" className="hover:text-white">Method</a>
             </nav>
             <div className="ml-auto flex items-center gap-2">
-              <Select value={receiverId?.toString()} onValueChange={(v) => setReceiverId(Number(v))}>
-                <SelectTrigger size="sm" className="w-[300px]">
-                  <SelectValue placeholder="Receiver" />
-                </SelectTrigger>
-                <SelectContent className="max-h-96">
-                  {receivers.map((p) => (
-                    <SelectItem key={p.nfl_id} value={p.nfl_id.toString()}>
-                      {p.display_name}
-                      <span className="text-zinc-500">
-                        {p.nfl_position} · {p.targets} targets
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ReceiverPicker receivers={receivers} value={receiverId} onChange={setReceiverId} />
             </div>
           </div>
         </header>
@@ -293,8 +300,8 @@ export function AkitRoom() {
             </div>
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
-              <h2 className="text-base font-medium text-zinc-50">
-                Plays <span className="text-zinc-500">· {receiver?.display_name ?? "—"}</span>
+              <h2 className="flex items-center gap-2 text-base font-medium text-zinc-50">
+                Plays for <ReceiverPicker receivers={receivers} value={receiverId} onChange={setReceiverId} compact />
               </h2>
               <span className="text-xs text-zinc-500">
                 {total} targets{total > plays.length ? ` · showing ${plays.length}` : ""} · in game order
@@ -311,29 +318,115 @@ export function AkitRoom() {
           </section>
 
           <div id="finding" className="grid scroll-mt-20 gap-6 xl:grid-cols-2">
-            <Panel eyebrow="Finding 1 · Space at the throw" title="More space at the throw means more catches">
+            <Panel
+              eyebrow="Finding 1 · Space at the throw"
+              title="More open space when the ball is thrown = more catches"
+              hint="We sorted every throw into four equal groups, from least to most open space around the receiver. Taller bar = more passes caught."
+            >
               {summary ? <CatchByDsv s={summary} /> : <Skeleton className="h-72 w-full" />}
             </Panel>
-            <Panel eyebrow="Finding 2 · Quarterback decisions" title="Throwing to the most open receiver pays off">
+            <Panel
+              eyebrow="Finding 2 · Quarterback decisions"
+              title="QBs often skip the most open receiver"
+              hint="On each play we ranked every receiver by open space. Each bar shows how often the pass was caught, depending on which receiver the QB picked."
+            >
               {summary ? <QbDecision s={summary} /> : <Skeleton className="h-72 w-full" />}
             </Panel>
-            <Panel eyebrow="Finding 3 · After the release" title="Space gained once the ball is out matters little">
+            <Panel
+              eyebrow="Finding 3 · After the throw"
+              title="Space that opens after the throw barely helps"
+              hint="Did the receiver gain or lose space in the half-second after the ball left? Either way, the catch rate is almost the same."
+            >
               {summary ? <SiceSplit s={summary} /> : <Skeleton className="h-72 w-full" />}
             </Panel>
-            <Panel eyebrow="Finding 4 · Predictive power" title="DSV compared with separation">
+            <Panel
+              eyebrow="Finding 4 · How good is the measure?"
+              title="Does open space predict a catch?"
+              hint="Each dot is a score from 0.5 (a coin flip) to 1 (always right) for telling catches from incompletions. Further right = better predictor."
+            >
               {summary ? <AucChart s={summary} /> : <Skeleton className="h-72 w-full" />}
             </Panel>
-            <Panel eyebrow="Leaderboard" title="Who commands the most space at the throw">
-              {leaders ? (
-                <AkitLeaderboard rows={leaders.rows} league={leaders.league_dsv} selected={receiverId} onSelect={selectReceiver} />
+            <Panel
+              eyebrow="Leaderboard"
+              title="Receivers who get the most open space"
+              hint="Average open space when the ball is thrown to them. Click a name to watch his plays above."
+            >
+              {leaders && summary ? (
+                <AkitLeaderboard
+                  rows={leaders.rows}
+                  league={leaders.league_dsv}
+                  baseCatch={summary.base_catch}
+                  selected={receiverId}
+                  onSelect={selectReceiver}
+                />
               ) : (
                 <Skeleton className="h-72 w-full" />
               )}
             </Panel>
-            <Panel eyebrow="Position groups" title="Running backs, tight ends and wide receivers">
+            <Panel
+              eyebrow="Position groups"
+              title="Running backs get the most space, wide receivers the least"
+              hint="Open space is measured in square yards around the receiver. Catch rate is colored on the same scale as the charts."
+            >
               {summary ? <PositionTable s={summary} /> : <Skeleton className="h-24 w-full" />}
             </Panel>
           </div>
+
+          <section id="control" className="flex scroll-mt-20 flex-col gap-6">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_460px] lg:items-end">
+              <div>
+                <p className="text-sm text-zinc-500">Deep dive · catch-point control</p>
+                <h2 className="mt-2 text-2xl leading-tight font-medium tracking-tight text-zinc-50 md:text-3xl">
+                  Separation is a distance. Control is a field.
+                </h2>
+              </div>
+              <p className="border-l border-white/15 pl-5 text-sm leading-relaxed text-zinc-400">
+                Separation only measures the gap to the nearest defender. Catch-point control asks a better question: when the ball is thrown, who owns
+                the spot where it will come down? 0.5 means a toss-up, 1 means the receiver owns it. Same 2021 data,{" "}
+                {control ? `${control.n_plays.toLocaleString()} targets with a usable catch point` : "targets with a usable catch point"}.
+              </p>
+            </div>
+            <div className="grid gap-6 xl:grid-cols-2">
+              <Panel
+                eyebrow="Same separation, different outcome"
+                title="Two receivers can be equally open and still have very different odds"
+                hint="Each column is a range of separation. Inside each column, plays are split into three equal groups by how much the receiver controlled the landing spot. At 1–2 yards apart, the catch rate goes from 34% to 67%."
+                className="xl:col-span-2"
+              >
+                {control ? <SameSeparation d={control} /> : <Skeleton className="h-72 w-full" />}
+              </Panel>
+              <Panel
+                eyebrow="Control is not just distance"
+                title="More separation usually means more control, but not always"
+                hint="Each dot is one throw: teal was caught, orange was not. The background shows the catch rate in that area. Above the dashed line, the receiver owns the landing spot."
+              >
+                {control ? <SeparationVsControl d={control} /> : <Skeleton className="h-72 w-full" />}
+              </Panel>
+              <Panel
+                eyebrow="Leverage"
+                title="Being closer to the landing spot wins catches"
+                hint="Columns show who was closer to where the ball would land. Even with the same separation, the receiver wins more often when he is closer."
+              >
+                {control ? <LeverageGrid d={control} /> : <Skeleton className="h-72 w-full" />}
+              </Panel>
+              <Panel
+                eyebrow="Timing"
+                title="Catches are won in the second before the throw"
+                hint="Average values for passes that were caught (teal) and not caught (orange), from 1 second before the throw to just after. Control pulls apart before the ball is thrown; separation barely changes."
+                className="xl:col-span-2"
+              >
+                {control ? <ControlTimeline d={control} /> : <Skeleton className="h-56 w-full" />}
+              </Panel>
+              <Panel
+                eyebrow="Ideas we tested"
+                title="Does a faster receiver or a turned defender change things?"
+                hint="Bars above zero mean the receiver had more control than his separation alone would suggest; below zero, less."
+                className="xl:col-span-2"
+              >
+                {control ? <Hypotheses d={control} /> : <Skeleton className="h-56 w-full" />}
+              </Panel>
+            </div>
+          </section>
 
           <Panel eyebrow="Method" title="How it is measured" className="scroll-mt-20">
             <div id="method" className="grid gap-6 text-sm leading-relaxed text-zinc-400 md:grid-cols-3">
