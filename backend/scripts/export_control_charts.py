@@ -1,14 +1,14 @@
-"""Aggregate the catch-point-control pre-work into chart data for the dashboard.
+"""Aggregate catch-point-control metrics into chart data for the dashboard.
 
-Source: https://github.com/hard-hustler/NFL-PRE-WORK (data/derived), same 2021 weeks 1-8 dataset.
-    .venv/bin/python scripts/export_prework_charts.py ~/Downloads/NFL/NFL-PRE-WORK/data/derived
+Input: a folder with play_metrics.csv and frame_metrics.csv.gz (same 2021 weeks 1-8 dataset).
+    .venv/bin/python scripts/export_control_charts.py <derived-data-dir>
 
 Writes frontend/public/data/control.json with:
-  sameSep    completion by separation bin x control third (pre-work fig 02)
-  joint      separation vs control points + binned completion (fig 03)
-  timeline   control / separation / owned area vs time from release, by outcome (fig 05)
-  leverage   completion by separation x receiver lead to the catch point (fig 08, regrouped)
-  hypotheses COES by receiver speed and by defender hip angle (fig 10)
+  sameSep    completion by separation bin x control third
+  joint      separation vs control points + binned completion
+  timeline   control / separation / owned area vs time from release, by outcome
+  leverage   completion by separation x receiver lead to the catch point (regrouped)
+  hypotheses COES by receiver speed and by defender hip angle
 """
 import json
 import sys
@@ -17,7 +17,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-SRC = Path(sys.argv[1] if len(sys.argv) > 1 else "~/Downloads/NFL/NFL-PRE-WORK/data/derived").expanduser()
+SRC = Path(sys.argv[1]).expanduser()
 OUT = Path(__file__).resolve().parents[2] / "frontend" / "public" / "data" / "control.json"
 
 df = pd.read_csv(SRC / "play_metrics.csv")

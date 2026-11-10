@@ -45,7 +45,7 @@ export function RateScale({ base }: { base: number }) {
   )
 }
 
-/** Pre-work fig 02: same separation, split into control thirds. */
+/** Same separation, split into control thirds. */
 export function SameSeparation({ d }: { d: ControlData }) {
   const { ref, shown } = useReveal()
   const heat = useTooltip()
@@ -199,7 +199,7 @@ export function SameSeparation({ d }: { d: ControlData }) {
   )
 }
 
-/** Pre-work fig 03: every target as a point, binned completion behind. */
+/** Every target as a point, binned completion behind. */
 export function SeparationVsControl({ d }: { d: ControlData }) {
   const { ref, shown } = useReveal()
   const { box, bind, node, active } = useTooltip()
@@ -358,7 +358,7 @@ function SmallTimeline({
   )
 }
 
-/** Pre-work fig 05: the last second before release. */
+/** The last second before release. */
 export function ControlTimeline({ d }: { d: ControlData }) {
   const { ref, shown } = useReveal()
   return (
@@ -374,7 +374,7 @@ export function ControlTimeline({ d }: { d: ControlData }) {
   )
 }
 
-/** Pre-work fig 08, regrouped so every populated cell has a usable sample. */
+/** Leverage grid, regrouped so every populated cell has a usable sample. */
 export function LeverageGrid({ d }: { d: ControlData }) {
   const { ref, shown } = useReveal()
   const { box, bind, node, active } = useTooltip()
@@ -530,7 +530,7 @@ function CoesBars({
   )
 }
 
-/** Pre-work fig 10: hypotheses tested, with the speed/depth confound shown on the chart. */
+/** Hypotheses tested, with the speed/depth confound shown on the chart. */
 export function Hypotheses({ d }: { d: ControlData }) {
   const { ref, shown } = useReveal()
   return (

@@ -1,4 +1,4 @@
-/** Catch-point control charts, exported by backend/scripts/export_prework_charts.py. */
+/** Catch-point control charts, exported by backend/scripts/export_control_charts.py. */
 
 export interface Prop {
   n: number
