@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { DOMINANCE_COLOR, NEUTRAL_COLOR, rateColor, type AkitLeader, type AkitSummary } from "@/lib/akit"
 import { dim, ease, useReveal, useTooltip } from "./chart-kit"
 import { RateScale } from "./control-charts"
+import { PlayerFace } from "./player-face"
 
 const pct = (v: number) => `${(v * 100).toFixed(0)}%`
 const ci = (lo: number, hi: number) => `${pct(lo)}–${pct(hi)}`
@@ -361,8 +362,11 @@ export function AkitLeaderboard({
               style={{ opacity: dim(active, key), transition: "opacity 150ms, background-color 150ms" }}
             >
               <span className="text-xs text-zinc-500 tabular-nums">{i + 1}</span>
-              <span className="truncate text-sm text-zinc-100">
-                {r.display_name} <span className="text-xs text-zinc-500">{r.nfl_position}</span>
+              <span className="flex min-w-0 items-center gap-2 text-sm text-zinc-100">
+                <PlayerFace id={r.nfl_id} name={r.display_name} size={24} />
+                <span className="truncate">
+                  {r.display_name} <span className="text-xs text-zinc-500">{r.nfl_position}</span>
+                </span>
               </span>
               <span className="text-right text-xs text-zinc-400 tabular-nums">{r.targets}</span>
               <span className="relative flex h-5 items-center">
