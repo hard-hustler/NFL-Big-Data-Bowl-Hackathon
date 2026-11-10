@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import dynamic from "next/dynamic"
-import { Camera, Crosshair, Grid2x2, Layers, Orbit, PanelRight, Tv } from "lucide-react"
+import { Camera, Crosshair, Grid2x2, Layers, Orbit, PanelRight, Repeat, Tv } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -90,6 +90,8 @@ export function AkitRoom() {
   const [frame, setFrame] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(0.5)
+  const [autoplay, setAutoplay] = useState(true)
+  const [ended, setEnded] = useState(false)
   const [camera, setCamera] = useState<AkitCamera>("broadcast")
   const stageRef = useRef<HTMLDivElement>(null)
 
@@ -125,6 +127,7 @@ export function AkitRoom() {
       return
     }
     setPlaying(false)
+    setEnded(false)
     getAkitPlay(current)
       .then((d) => {
         timeRef.current = 0
@@ -137,10 +140,24 @@ export function AkitRoom() {
 
   const seek = useCallback((f: number) => {
     setPlaying(false)
+    setEnded(false)
     timeRef.current = f
     setFrame(f)
   }, [])
-  const onEnd = useCallback(() => setPlaying(false), [])
+  const onEnd = useCallback(() => {
+    setPlaying(false)
+    setEnded(true)
+  }, [])
+
+  // Autoplay: after a play finishes, pause briefly, then load the next card (wrapping to the first).
+  useEffect(() => {
+    if (!ended || !autoplay || plays.length < 2 || !current) return
+    const t = setTimeout(() => {
+      const i = plays.findIndex((p) => p.game_id === current.game_id && p.play_id === current.play_id)
+      setCurrent(plays[(i + 1) % plays.length])
+    }, 1500)
+    return () => clearTimeout(t)
+  }, [ended, autoplay, plays, current])
 
   const m = detail?.meta
   const n = detail?.players[0].frames.length ?? 1
@@ -171,7 +188,7 @@ export function AkitRoom() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-[#0a0b0e] text-zinc-100">
+      <div className="app-zoom min-h-screen bg-[#0a0b0e] text-zinc-100">
         <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#0a0b0e]/95 backdrop-blur">
           <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-4 px-4 md:px-6">
             <div className="flex items-baseline gap-3">
@@ -280,6 +297,7 @@ export function AkitRoom() {
                       playing={playing}
                       speed={speed}
                       onToggle={() => {
+                        setEnded(false)
                         if (frame >= n - 1) {
                           timeRef.current = 0
                           setFrame(0)
@@ -287,6 +305,7 @@ export function AkitRoom() {
                         setPlaying((p) => !p)
                       }}
                       onRestart={() => {
+                        setEnded(false)
                         timeRef.current = 0
                         setFrame(0)
                         setPlaying(true)
@@ -306,14 +325,25 @@ export function AkitRoom() {
               <span className="text-xs text-zinc-500">
                 {total} targets{total > plays.length ? ` · showing ${plays.length}` : ""} · in game order
               </span>
+              {ended && autoplay && plays.length > 1 && <span className="animate-pulse text-xs text-teal-300">Next play in a moment…</span>}
               <div className="ml-auto flex items-center gap-2">
+                <Toggle
+                  size="sm"
+                  variant="outline"
+                  pressed={autoplay}
+                  onPressedChange={setAutoplay}
+                  className="gap-1.5 px-3 text-xs data-[state=on]:border-teal-400/50 data-[state=on]:text-teal-200"
+                  aria-label="Autoplay next play"
+                >
+                  <Repeat className="size-3.5" /> Autoplay {autoplay ? "on" : "off"}
+                </Toggle>
                 <Toggle size="sm" variant="outline" pressed={contestedOnly} onPressedChange={setContestedOnly} className="px-3 text-xs">
                   Tight coverage only (defender ≤ 2 yd)
                 </Toggle>
               </div>
             </div>
             <div className="mt-3">
-              <AkitFilmstrip plays={plays} current={current} onSelect={setCurrent} />
+              <AkitFilmstrip plays={plays} current={current} onSelect={setCurrent} progress={n > 1 ? frame / (n - 1) : 0} />
             </div>
           </section>
 

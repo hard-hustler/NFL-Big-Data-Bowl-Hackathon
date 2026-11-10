@@ -126,4 +126,11 @@
     @apply bg-background text-foreground;
     font-family: var(--font-roboto), system-ui, sans-serif;
   }
+  /* Default view matches Chrome at 110% on laptop and desktop screens. Applied to the page
+     container, not <html>, so portaled popovers/sheets keep correct positioning. */
+  @media (min-width: 1024px) {
+    .app-zoom {
+      zoom: 1.1;
+    }
+  }
 }

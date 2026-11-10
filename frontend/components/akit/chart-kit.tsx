@@ -47,9 +47,12 @@ export function useTooltip() {
   const box = useRef<HTMLDivElement>(null)
   const [tip, setTip] = useState<{ x: number; y: number; key: string; content: TipContent } | null>(null)
   const move = useCallback((e: React.MouseEvent, key: string, content: TipContent) => {
-    const r = box.current?.getBoundingClientRect()
-    if (!r) return
-    setTip({ x: e.clientX - r.left, y: e.clientY - r.top, key, content })
+    const el = box.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    // Page CSS zoom (globals.css): client coords are zoomed, but `left`/`top` are applied in unzoomed px.
+    const z = el.offsetWidth ? r.width / el.offsetWidth : 1
+    setTip({ x: (e.clientX - r.left) / z, y: (e.clientY - r.top) / z, key, content })
   }, [])
   const bind = (key: string, content: TipContent) => ({
     onMouseEnter: (e: React.MouseEvent) => move(e, key, content),
