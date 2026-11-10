@@ -25,6 +25,8 @@ git clone --depth 1 https://github.com/ThompsonJamesBliss/nfl-big-data-bowl-regi
 # catch-point-control charts from the pre-work repo
 git clone --depth 1 https://github.com/hard-hustler/NFL-PRE-WORK ~/Downloads/NFL/NFL-PRE-WORK
 .venv/bin/python scripts/export_prework_charts.py ~/Downloads/NFL/NFL-PRE-WORK/data/derived  # -> frontend/public/data/control.json
+# player headshots (nflverse 2021 rosters; gsis_it_id = nflId) -> frontend/public/data/headshots.json
+.venv/bin/python scripts/export_headshots.py
 ```
 
 `backend/main.py` also serves the same data as a FastAPI app (`.venv/bin/uvicorn main:app --port 8000`) for exploration:

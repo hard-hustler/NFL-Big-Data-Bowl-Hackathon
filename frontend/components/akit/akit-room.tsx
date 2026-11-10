@@ -9,7 +9,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Toggle } from "@/components/ui/toggle"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {
+  DEFENSE_COLOR,
+  DOMINANCE_COLOR,
   dominance,
+  OFFENSE_COLOR,
   fieldOf,
   getAkitLeaders,
   getAkitPlay,
@@ -26,6 +29,7 @@ import {
 import type { AkitCamera } from "@/components/replay/akit-scene"
 import { opponentOf, ord, ScoreBug, Transport } from "./broadcast-hud"
 import { AkitFilmstrip } from "./akit-filmstrip"
+import { PlayerFace } from "./player-face"
 import { ReceiverPicker } from "./receiver-picker"
 import { AkitLowerThird, FieldLegend, FlightChart } from "./akit-hud"
 import { getControlData, type ControlData } from "@/lib/control"
@@ -155,7 +159,7 @@ export function AkitRoom() {
     const t = setTimeout(() => {
       const i = plays.findIndex((p) => p.game_id === current.game_id && p.play_id === current.play_id)
       setCurrent(plays[(i + 1) % plays.length])
-    }, 1500)
+    }, 1000)
     return () => clearTimeout(t)
   }, [ended, autoplay, plays, current])
 
@@ -520,8 +524,16 @@ export function AkitRoom() {
                     <ul className="flex flex-col divide-y divide-white/[0.05] text-sm">
                       {detail.players.filter((p) => p.role !== "ball" && p.role !== "option" && p.primary).map((p) => (
                         <li key={p.nfl_id} className="flex items-center justify-between py-1.5">
-                          <span className="text-zinc-200">
-                            {p.display_name} <span className="text-xs text-zinc-500">{p.position}</span>
+                          <span className="flex items-center gap-2.5 text-zinc-200">
+                            <PlayerFace
+                              id={p.nfl_id}
+                              name={p.display_name}
+                              size={30}
+                              ring={p.role === "target" ? DOMINANCE_COLOR : p.side === "defense" ? DEFENSE_COLOR : OFFENSE_COLOR}
+                            />
+                            <span>
+                              {p.display_name} <span className="text-xs text-zinc-500">{p.position}</span>
+                            </span>
                           </span>
                           <span className={`text-[11px] ${p.role === "target" ? "text-teal-300" : p.side === "defense" ? "text-orange-400" : "text-blue-400"}`}>
                             {p.role === "option" ? "most space" : p.role}

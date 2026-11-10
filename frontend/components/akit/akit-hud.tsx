@@ -1,6 +1,7 @@
 "use client"
 
 import { DEFENSE_COLOR, DOMINANCE_COLOR, OFFENSE_COLOR, type AkitMeta } from "@/lib/akit"
+import { PlayerFace } from "./player-face"
 
 /** Broadcast lower third for the targeted receiver: live DSV, SICE, nearest tracked defender. */
 export function AkitLowerThird({ m, dsv, nearest, phase }: { m: AkitMeta; dsv: number | null; nearest: number | null; phase: string }) {
@@ -17,6 +18,9 @@ export function AkitLowerThird({ m, dsv, nearest, phase }: { m: AkitMeta; dsv: n
   return (
     <div className="flex items-stretch overflow-hidden rounded-md border border-white/10 bg-[#0e1014]/90 backdrop-blur">
       <span className="w-1" style={{ background: DOMINANCE_COLOR }} />
+      <div className="flex items-center pl-3">
+        <PlayerFace id={m.nfl_id} name={m.display_name} size={44} ring={DOMINANCE_COLOR} />
+      </div>
       <div className="flex flex-col justify-center px-4 py-2.5">
         <span className="text-base leading-tight font-medium text-zinc-50">{m.display_name}</span>
         <span className="mt-0.5 text-xs text-zinc-500">
